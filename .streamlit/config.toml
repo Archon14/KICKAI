@@ -1,0 +1,17 @@
+[server]
+maxUploadSize = 200
+headless = true
+
+[client]
+showErrorDetails = "full"
+
+[theme]
+base = "dark"
+primaryColor = "#21D47B"
+backgroundColor = "#07110D"
+secondaryBackgroundColor = "#0D1B15"
+textColor = "#FFFFFF"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false

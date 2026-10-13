@@ -1,0 +1,3 @@
+player_id,team,x,y,z,ball_x,ball_y
+H10,home,76.5,33.5,0,78,34
+A4,away,88,30,,78,34
