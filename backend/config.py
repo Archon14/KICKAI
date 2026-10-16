@@ -20,7 +20,11 @@ OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
 USE_MOCK_DATA: bool = os.getenv("USE_MOCK_DATA", "true").lower() in ("true", "1", "yes", "t")
 OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "anthropic/claude-3.5-sonnet")
 
-CORS_ORIGINS: list[str] = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+_cors_env = os.getenv("CORS_ORIGINS")
+if _cors_env:
+    CORS_ORIGINS = [origin.strip() for origin in _cors_env.split(",")]
+else:
+    CORS_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]

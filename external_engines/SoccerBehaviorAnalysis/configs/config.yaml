@@ -1,0 +1,21 @@
+project_name: "SoccerNet_YOLO11_X"
+
+device: 0
+fps: 25
+
+names:
+  team: 18
+
+paths:
+  raw_data: "./dataset/raw_data"
+  roi: "./configs/roi.json"
+  split: "test"
+  yolo_dataset: "./dataset/yolo"
+  model_weights: "./weights/yolo11x.pt"
+  output_submission: "./output/submissions"
+  output_subdirs: ["track_no_reid_mask_full/behavior"]
+  output_val: "./output/validation"
+  temp_tracker_yaml: "./output/temp_botsort.yaml"
+
+  video_contest: "../../dataset/raw_data/contest" #Da modificare il path dove si trova il dataset di ground truth
+  output_contest: "./output/submissions/test_name/results" #Da modificare il path dove sono salvate le predizioni

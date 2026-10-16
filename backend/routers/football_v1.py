@@ -16,6 +16,7 @@ import hashlib
 import hmac
 import json
 import logging
+import os
 import time
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, Header, HTTPException, status
@@ -35,7 +36,11 @@ from backend.sports.football import (
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/football", tags=["commercial-football-v1"])
 
-JWT_SECRET = "kickai_production_commercial_secret_key_2026"
+JWT_SECRET = os.getenv("JWT_SECRET", "kickai_production_commercial_secret_key_2026")
+
+# In production, ensure JWT_SECRET is set via environment variable
+if JWT_SECRET == "kickai_production_commercial_secret_key_2026":
+    logger.warning("Using default JWT secret; set JWT_SECRET environment variable for production.")
 
 
 # ==============================================================================

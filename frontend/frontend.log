@@ -1,0 +1,43 @@
+
+> frontend@0.1.0 dev
+> next dev
+
+▲ Next.js 16.4.0 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.13:3000
+✓ Ready in 902ms
+✓ Running next.config.ts took 272ms
+- Cache Components enabled
+- Partial Prefetching enabled
+
+ GET / 200 in 705ms (next.js: 337ms, application-code: 368ms)
+ GET / 200 in 109ms (next.js: 2ms, application-code: 106ms)
+ GET /tactical 200 in 80ms (next.js: 16ms, application-code: 64ms)
+ GET / 200 in 55ms (next.js: 3ms, application-code: 52ms)
+ GET /tactical 200 in 80ms (next.js: 9ms, application-code: 70ms)
+ GET / 200 in 82ms (next.js: 4ms, application-code: 78ms)
+ GET /match 200 in 80ms (next.js: 19ms, application-code: 60ms)
+ GET /match 200 in 164ms (next.js: 4ms, application-code: 159ms)
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/api/match/simulate failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Match simulation failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/api/match/simulate failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Match simulation failed: TypeError: NetworkError when attempting to fetch resource.
+ GET / 200 in 85ms (next.js: 7ms, application-code: 77ms)
+ GET / 200 in 48ms (next.js: 4ms, application-code: 45ms)
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.
+ GET / 200 in 163ms (next.js: 5ms, application-code: 157ms)
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/api/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.
+[browser] Request to http://localhost:8000/health failed: TypeError: NetworkError when attempting to fetch resource.

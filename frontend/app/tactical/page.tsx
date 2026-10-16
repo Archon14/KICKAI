@@ -30,6 +30,7 @@ export default function TacticalLabPage() {
 
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<TacticsAnalyzeResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<TacticalOptionModel | null>(null);
 
   const [overrideFeedback, setOverrideFeedback] = useState<string | null>(null);
@@ -53,6 +54,7 @@ export default function TacticalLabPage() {
       }
     } catch (err: any) {
       console.error("Tactical analysis failed:", err);
+      setError("Failed to load tactical analysis. Check server connection.");
     } finally {
       setLoading(false);
     }
@@ -124,6 +126,12 @@ export default function TacticalLabPage() {
       </div>
 
       {/* Control Bar */}
+      {error && (
+        <div className="rounded-lg bg-rose-950/20 border border-rose-500/20 px-3 py-2 text-xs text-rose-400">
+          {error}
+        </div>
+      )}
+
       <div className="rounded-lg bg-zinc-900/40 border border-zinc-800/80 p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
           {/* Seed */}

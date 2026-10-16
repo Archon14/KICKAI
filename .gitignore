@@ -10,3 +10,6 @@ dist/
 build/
 *.spec
 extra/temp_input.mp4
+venv/
+.git.bak/
+.env
