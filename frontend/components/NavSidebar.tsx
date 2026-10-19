@@ -13,6 +13,8 @@ import {
   Compass,
   Flame,
   LayoutDashboard,
+  Mic,
+  VideoIcon,
 } from "lucide-react";
 
 export default function NavSidebar() {
@@ -26,6 +28,8 @@ export default function NavSidebar() {
     { label: "Training Lab", href: "/training", icon: Flame },
     { label: "Player Evaluation", href: "/player", icon: Award },
     { label: "Session Logs", href: "/sessions", icon: ClipboardList },
+    { label: "Video Analysis", href: "/video", icon: VideoIcon },
+    { label: "AI Face", href: "/face", icon: Mic },
   ];
 
   return (

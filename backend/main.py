@@ -19,6 +19,7 @@ from backend.config import CORS_ORIGINS, USE_MOCK_DATA, OPENROUTER_API_KEY
 from backend.routers import (
     ai_coach,
     coach,
+    face_acoustic,
     football_v1,
     formations,
     match,
@@ -123,6 +124,7 @@ app.include_router(coach.router)
 app.include_router(ai_coach.router)
 app.include_router(football_v1.router)
 app.include_router(video_analysis.router)
+app.include_router(face_acoustic.router)
 
 
 @app.get("/api/export/{report_type}")

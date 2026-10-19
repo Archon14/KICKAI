@@ -190,3 +190,51 @@ export async function getCoachHistory(): Promise<{ history: CoachLogEntry[]; cou
     };
   });
 }
+
+// ===================================================================
+// NEW BACKEND FEATURES (face acoustic, video analysis, export)
+// ===================================================================
+
+export interface FaceAcousticRequest {
+  query: string;
+  origin?: string;
+  failed?: boolean;
+  speech_text?: string;
+  enable_autoplay?: boolean;
+}
+
+export interface FaceAcousticResponse {
+  expression: string;
+  speech_text: string;
+  feedback: string;
+  html_embed?: string | null;
+  provenance: Record<string, any>;
+  mock?: boolean;
+}
+
+export async function getFaceFeedback(payload: FaceAcousticRequest): Promise<FaceAcousticResponse> {
+  return request<FaceAcousticResponse>("/api/face/acoustic_feedback", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export interface VideoUploadResponse {
+  status: string;
+  note?: string;
+}
+
+export async function uploadVideo(): Promise<VideoUploadResponse> {
+  return request<VideoUploadResponse>("/api/video/upload", { method: "POST" });
+}
+
+export interface ExportReportResponse {
+  status: string;
+  report_type: string;
+  format: string;
+  note?: string;
+}
+
+export async function exportReport(type: string): Promise<ExportReportResponse> {
+  return request<ExportReportResponse>(`/api/export/${type}`);
+}

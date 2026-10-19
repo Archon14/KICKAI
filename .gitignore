@@ -13,3 +13,42 @@ extra/temp_input.mp4
 venv/
 .git.bak/
 .env
+# Standalone / environment
+venv/
+.venv/
+
+# Python bytecode / caches
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Secrets / runtime logs
+.env
+*.env
+backend/server.log
+frontend/*.log
+
+# Build outputs (Next.js / streamlit)
+frontend/.next/
+.streamlit/
+
+# Dependencies (installed via npm/pip, not needed in repo)
+frontend/node_modules/
+
+# Backed-up nested repo histories
+external_engines/*/.git.bak/
+
+# Large binary / model artifacts from external engines
+*.pkl
+*.pth
+*.weights
+*.pt
+*.ckpt
+
+# External engine dataset / training artifacts (optional — keep source only)
+external_engines/FootballVision/training/
+external_engines/FootballVision/runs/
+external_engines/FootballAnalysisYOLO/stubs/
+external_engines/FootballVision/output_images/
+external_engines/FootballVision/output_videos/
