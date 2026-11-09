@@ -36,15 +36,15 @@ frontend/.next/
 # Dependencies (installed via npm/pip, not needed in repo)
 frontend/node_modules/
 
-# Backed-up nested repo histories
+# Backed-up nested repo histories (keep source only)
 external_engines/*/.git.bak/
+# Don't ignore .git if you want clean history preserved locally
 
-# Large binary / model artifacts from external engines
-*.pkl
-*.pth
-*.weights
-*.pt
-*.ckpt
+# Large binary / model artifacts from external engines (optional — keep source only)
+external_engines/*/runs/
+external_engines/*/output_images/
+external_engines/*/output_videos/
+external_engines/*/training/
 
 # External engine dataset / training artifacts (optional — keep source only)
 external_engines/FootballVision/training/
@@ -52,3 +52,19 @@ external_engines/FootballVision/runs/
 external_engines/FootballAnalysisYOLO/stubs/
 external_engines/FootballVision/output_images/
 external_engines/FootballVision/output_videos/
+
+# KICKAI temporary backups
+.kickai-backups/
+*.step*.bak
+*.save
+frontend/branding_backup/
+
+# Generated video and analysis outputs
+temp_input.mp4
+backend/video_outputs/
+demo_clips/
+demo_results/
+frontend/public/video-compare/*.mp4
+
+# Local caches
+.pytest_cache/

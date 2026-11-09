@@ -93,4 +93,26 @@ def serialize_report(report: DecisionReport, state: WorldState) -> dict[str, Any
         "ball_origin": state.ball.origin.value,
         "players_visible": len(state.visible_players()),
         "players_off_camera": sum(1 for p in state.players if p.xy is None),
+        "pitch_players": [
+            {
+                "id": p.profile.player_id,
+                "name": p.profile.name,
+                "team": p.profile.team,
+                "number": int(p.profile.player_id[1:]),
+                "x": float(p.xy[0]),
+                "y": float(p.xy[1]),
+                "energy": float(p.energy),
+                "fatigue": float(p.fatigue),
+                "current_action": p.current_action,
+            }
+            for p in state.visible_players()
+        ],
+        "ball_position": (
+            {"x": float(state.ball.xy[0]), "y": float(state.ball.xy[1])}
+            if state.ball.xy is not None else None
+        ),
+        "ball_carrier_id": (
+            state.on_ball().profile.player_id if state.on_ball() is not None else None
+        ),
+        "scenario_type": getattr(state, "scenario_type", "central_attack"),
     }

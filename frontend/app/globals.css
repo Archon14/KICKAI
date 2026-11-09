@@ -17,8 +17,8 @@
 }
 
 body {
-  background-color: #09090b;
-  color: #fafafa;
+  background-color: var(--kick-bg);
+  color: var(--kick-text);
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
@@ -59,4 +59,217 @@ body {
 /* Subtle transitions */
 .radar-polygon {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+/* KICKAI THEME PALETTES */
+
+/* Emerald */
+[data-theme="emerald"] {
+  --kick-bg: #102b25;
+  --kick-card: #1c4539;
+  --kick-border: #376b57;
+  --kick-primary: #10b981;
+  --kick-secondary: #a3e635;
+  --kick-text: #f0fdf4;
+  --kick-muted: #c5e8d6;
+}
+
+/* Electric */
+[data-theme="electric"] {
+  --kick-bg: #0b1220;
+  --kick-card: #172338;
+  --kick-border: #30435f;
+  --kick-primary: #3b82f6;
+  --kick-secondary: #22d3ee;
+  --kick-text: #f8fafc;
+  --kick-muted: #a6b8ce;
+}
+
+/* Purple */
+[data-theme="purple"] {
+  --kick-bg: #17142b;
+  --kick-card: #292442;
+  --kick-border: #49416b;
+  --kick-primary: #8b5cf6;
+  --kick-secondary: #38bdf8;
+  --kick-text: #f5f3ff;
+  --kick-muted: #b8acd6;
+}
+
+/* Crimson */
+[data-theme="crimson"] {
+  --kick-bg: #211a23;
+  --kick-card: #382932;
+  --kick-border: #66404e;
+  --kick-primary: #e11d48;
+  --kick-secondary: #fda4af;
+  --kick-text: #fff1f2;
+  --kick-muted: #d9b7c0;
+}
+
+/* Ocean */
+[data-theme="ocean"] {
+  --kick-bg: #11232a;
+  --kick-card: #1c3b43;
+  --kick-border: #37636c;
+  --kick-primary: #14b8a6;
+  --kick-secondary: #7dd3fc;
+  --kick-text: #f0fdfa;
+  --kick-muted: #b0d3d7;
+}
+
+/* Gold */
+[data-theme="gold"] {
+  --kick-bg: #1d1a12;
+  --kick-card: #332c1c;
+  --kick-border: #635334;
+  --kick-primary: #eab308;
+  --kick-secondary: #fde68a;
+  --kick-text: #fffbeb;
+  --kick-muted: #d6c9a6;
+}
+
+/* Lime */
+[data-theme="lime"] {
+  --kick-bg: #141d16;
+  --kick-card: #26362a;
+  --kick-border: #45664b;
+  --kick-primary: #84cc16;
+  --kick-secondary: #2dd4bf;
+  --kick-text: #f7fee7;
+  --kick-muted: #bdd6b9;
+}
+
+/* KICKAI cinematic scroll presentation */
+html {
+  scroll-behavior: smooth;
+}
+
+.kick-cinematic-hero {
+  background:
+    radial-gradient(ellipse at 50% 65%, color-mix(in srgb, var(--kick-primary) 12%, transparent), transparent 65%),
+    var(--kick-bg);
+}
+
+@keyframes kickCinematicBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+.kick-cinematic-bounce {
+  animation: kickCinematicBounce 1.8s ease-in-out infinite;
+}
+
+@supports (animation-timeline: view()) {
+  .kick-scroll-reveal {
+    animation: kickReveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+
+  @keyframes kickReveal {
+    from {
+      opacity: 0.2;
+      transform: translateY(45px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kick-cinematic-bounce,
+  .kick-scroll-reveal {
+    animation: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+
+/* Cinematic presentation enhancements */
+.kick-presentation {
+  isolation: isolate;
+}
+
+.kick-presentation [data-scene] {
+  position: relative;
+  overflow: hidden;
+  scroll-margin-top: 12px;
+}
+
+.kick-presentation [data-scene]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 100px rgba(0,0,0,.22);
+}
+
+.kick-presentation [data-scene] > * {
+  position: relative;
+  z-index: 2;
+}
+
+.kick-presentation [data-scene] h1,
+.kick-presentation [data-scene] h2 {
+  text-wrap: balance;
+}
+
+.kick-presentation [data-scene] {
+  background-attachment: local;
+}
+
+@keyframes kickSceneEntrance {
+  from {
+    opacity: .45;
+    transform: translateY(55px) scale(.97);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .kick-presentation [data-scene] > h1,
+  .kick-presentation [data-scene] > h2,
+  .kick-presentation [data-scene] > div,
+  .kick-presentation [data-scene] > p {
+    animation: kickSceneEntrance linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+}
+
+.kick-presentation video {
+  box-shadow: 0 25px 90px rgba(0,0,0,.45);
+}
+
+.kick-presentation button,
+.kick-presentation a {
+  transition: transform .25s ease, border-color .25s ease, background-color .25s ease;
+}
+
+.kick-presentation button:hover,
+.kick-presentation a:hover {
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kick-presentation *,
+  .kick-presentation *::before,
+  .kick-presentation *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
 }

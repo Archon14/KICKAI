@@ -103,6 +103,8 @@ def _save_snapshot(text: str) -> None:
 def fetch_ranking(as_of: Optional[date] = None, force: bool = False) -> tuple[list[dict], bool]:
     """Full ranking for a day. Returns (rows, from_cache)."""
     day = as_of or date.today()
+    if not force:
+        return _load_snapshot(), True
     # ClubElo may not have today's file yet — walk back up to 7 days.
     for offset in range(0, 8):
         d = day - timedelta(days=offset)
@@ -152,6 +154,9 @@ def fetch_team_elo(team_name: str, force: bool = False) -> Optional[ClubEloRatin
             from_cache=from_cache,
             as_of=date.today().isoformat(),
         )
+
+    if not force:
+        return None
 
     # Per-team history endpoint (CSV).
     club = _clubelo_name(team_name)

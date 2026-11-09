@@ -63,6 +63,10 @@ class TacticsAnalyzeResponse(BaseModel):
     ball_origin: str
     players_visible: int
     players_off_camera: int
+    pitch_players: list[dict[str, Any]] = Field(default_factory=list)
+    ball_position: Optional[dict[str, float]] = None
+    ball_carrier_id: Optional[str] = None
+    scenario_type: str = "central_attack"
     mock: bool = False
 
 
@@ -153,6 +157,8 @@ class PlayerEvaluationRequest(BaseModel):
     max_speed_mps: float = Field(default=8.2, ge=5.0, le=11.0)
     accel_limit: float = Field(default=4.4, ge=2.0, le=6.5)
     fatigue: float = Field(default=0.25, ge=0.0, le=1.0)
+    defending: float = Field(default=0.50, ge=0.0, le=1.0)
+    physical: float = Field(default=0.50, ge=0.0, le=1.0)
 
 
 class PlayerEvaluationResponse(BaseModel):
@@ -185,6 +191,7 @@ class DrillModel(BaseModel):
 
 
 class TrainingAdaptiveDrillRequest(BaseModel):
+    success_streak: int = Field(default=0, ge=0, description="Consecutive successes before the current repetition")
     success: bool = Field(description="Did the player succeed in the previous rep?")
     error: Optional[str] = Field(
         default=None,

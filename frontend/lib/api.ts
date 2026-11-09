@@ -15,7 +15,7 @@ import type {
   CoachLogEntry,
 } from "./types";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE = "";
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${BASE}${endpoint}`;
@@ -89,9 +89,11 @@ export async function simulateMatch(payload: MatchSimulateRequest): Promise<Matc
 export async function getDrill(
   success: boolean,
   error_mode?: string | null,
-  current_difficulty: number = 0.4
+  current_difficulty: number = 0.4,
+  success_streak: number = 0
 ): Promise<TrainingAdaptiveDrillResponse> {
   const body: TrainingAdaptiveDrillRequest = {
+    success_streak,
     success,
     error: error_mode || null,
     current_difficulty,
@@ -120,6 +122,8 @@ export async function evaluatePlayer(
     max_speed_mps: typeof payloadOrId === "object" && payloadOrId.max_speed_mps !== undefined ? payloadOrId.max_speed_mps : 8.2,
     accel_limit: typeof payloadOrId === "object" && payloadOrId.accel_limit !== undefined ? payloadOrId.accel_limit : 4.4,
     fatigue: typeof payloadOrId === "object" && payloadOrId.fatigue !== undefined ? payloadOrId.fatigue : 0.25,
+    defending: typeof payloadOrId === "object" && payloadOrId.defending !== undefined ? payloadOrId.defending : 0.50,
+    physical: typeof payloadOrId === "object" && payloadOrId.physical !== undefined ? payloadOrId.physical : 0.50,
   };
 
   return request<PlayerEvaluationResponse>("/api/player-evaluation", {
@@ -221,11 +225,28 @@ export async function getFaceFeedback(payload: FaceAcousticRequest): Promise<Fac
 
 export interface VideoUploadResponse {
   status: string;
+  video_id: string;
+  frames_processed: number;
+  detections_by_class: Record<string, number>;
+  annotated_video_url: string;
   note?: string;
 }
 
-export async function uploadVideo(): Promise<VideoUploadResponse> {
-  return request<VideoUploadResponse>("/api/video/upload", { method: "POST" });
+export async function uploadVideo(file: File): Promise<VideoUploadResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("/api/video/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Upload failed (${response.status})`);
+  }
+
+  return response.json() as Promise<VideoUploadResponse>;
 }
 
 export interface ExportReportResponse {
@@ -237,4 +258,20 @@ export interface ExportReportResponse {
 
 export async function exportReport(type: string): Promise<ExportReportResponse> {
   return request<ExportReportResponse>(`/api/export/${type}`);
+}
+
+export interface PlayerItem {
+  rank: number;
+  name: string;
+  position: string;
+  club: string;
+  rating: number;
+}
+
+export async function getTopPlayers(): Promise<{ source: string; count: number; players: PlayerItem[]; formations_available: number }> {
+  return request<{ source: string; count: number; players: PlayerItem[]; formations_available: number }>('/api/players/top');
+}
+
+export async function getPopularFormations(): Promise<{ source: string; formations: any[] }> {
+  return request<{ source: string; formations: any[] }>('/api/formations/popular');
 }

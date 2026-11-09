@@ -20,7 +20,8 @@ async def generate_adaptive_drill(payload: TrainingAdaptiveDrillRequest) -> Trai
         mock_data = get_mock_training_response(
             success=payload.success,
             error=payload.error,
-            current_difficulty=payload.current_difficulty or 0.4,
+            current_difficulty=payload.current_difficulty if payload.current_difficulty is not None else 0.4,
+            success_streak=payload.success_streak,
         )
         return TrainingAdaptiveDrillResponse(**mock_data)
 
@@ -31,6 +32,7 @@ async def generate_adaptive_drill(payload: TrainingAdaptiveDrillRequest) -> Trai
         if payload.current_difficulty is not None:
             coach.difficulty = float(payload.current_difficulty)
 
+        coach.success_streak = payload.success_streak
         plan = coach.observe(payload.success, payload.error)
         drill_dict = {
             "name": plan.drill.name,
@@ -58,7 +60,8 @@ async def generate_adaptive_drill(payload: TrainingAdaptiveDrillRequest) -> Trai
         fallback = get_mock_training_response(
             success=payload.success,
             error=payload.error,
-            current_difficulty=payload.current_difficulty or 0.4,
+            current_difficulty=payload.current_difficulty if payload.current_difficulty is not None else 0.4,
+            success_streak=payload.success_streak,
         )
         fallback["mock"] = True
         return TrainingAdaptiveDrillResponse(**fallback)
