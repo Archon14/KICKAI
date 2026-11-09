@@ -36,6 +36,34 @@ class MatchupStats:
 def lookup_team(name: str, force: bool = False) -> TeamStats:
     notes: list[str] = []
     rating = fetch_team_elo(name, force=force)
+    if rating is None and not force:
+        import json
+        from pathlib import Path
+        ratings_file = Path(__file__).resolve().parents[2] / "data/football/team_ratings.json"
+        if ratings_file.exists():
+            ratings = json.loads(ratings_file.read_text())
+            aliases = {
+                "manchester city": "Man City",
+                "manchester united": "Man United",
+                "nottingham forest": "Nott'm Forest",
+                "newcastle united": "Newcastle",
+                "tottenham hotspur": "Tottenham",
+                "brighton and hove albion": "Brighton",
+            }
+            team = aliases.get(name.strip().lower(), name.strip())
+            match = next((key for key in ratings if key.lower() == team.lower()), None)
+            if match:
+                return TeamStats(
+                    query=name,
+                    clubelo_name=match,
+                    elo=float(ratings[match]["elo"]),
+                    elo_origin="ESTIMATED",
+                    elo_source="2025-26 Premier League match results",
+                    rank=None,
+                    country="England",
+                    from_cache=True,
+                    notes=["Historical rating estimate, not official ClubElo."],
+                )
     if rating is None:
         notes.append("ClubElo lookup failed — API may be down or team name not found.")
         return TeamStats(

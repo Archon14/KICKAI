@@ -33,8 +33,8 @@ export default function MockBadge() {
 
   if (loading && isMock === null) {
     return (
-      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-zinc-850 text-zinc-400 border border-zinc-800">
-        <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-pulse" />
+      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[var(--kick-card)] text-[var(--kick-muted)] border border-[var(--kick-border)]">
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--kick-muted)] animate-pulse" />
         <span>Connecting</span>
       </div>
     );
@@ -44,7 +44,7 @@ export default function MockBadge() {
     return (
       <div
         title="Running deterministic local mock mode"
-        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-950/30 text-emerald-400 border border-emerald-500/20"
+        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[var(--kick-bg)] text-[var(--kick-primary)] border border-[var(--kick-border)]"
       >
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
         <span className="tracking-wide">Mock Engine</span>

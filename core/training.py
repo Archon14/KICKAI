@@ -54,7 +54,7 @@ class AdaptiveCoach:
         if success:
             self.success_streak += 1
             self.fail_streak = 0
-            if self.success_streak >= 3:
+            if self.success_streak > 0 and self.success_streak % 3 == 0:
                 self.difficulty = min(1.0, self.difficulty + 0.08)
                 self.success_streak = 0
             weakness = "raise tempo / shrink space"

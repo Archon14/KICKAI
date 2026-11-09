@@ -159,7 +159,14 @@ class TacticalEngine:
             return None
         scored = []
         for mate in teammates:
+            if kind == "diagonal":
+                forward = float(mate.xy[0] - carrier.xy[0])
+                sideways = abs(float(mate.xy[1] - carrier.xy[1]))
+                if forward < 5.0 or sideways < 5.0:
+                    continue
             scored.append((self._pass_metrics(state, carrier, mate, kind), mate))
+        if not scored:
+            return None
         scored.sort(key=lambda item: item[0]["ev"], reverse=True)
         metrics, mate = scored[0]
         if kind == "safe":
@@ -229,7 +236,7 @@ class TacticalEngine:
         sep = _separation(mate, opponents)
         complete = float(np.clip(0.92 * lane_clear * (0.7 + 0.3 * carrier.profile.passing) * (1.0 - 0.15 * (dist / 40.0)), 0.05, 0.95))
         complete *= 1.0 - 0.4 * intercept_p
-        chance = float(np.clip(0.04 + 0.04 * sep + (0.08 if kind == "diagonal" else 0.0), 0.01, 0.35))
+        chance = float(np.clip(0.04 + 0.04 * sep, 0.01, 0.35))
         width = abs(float(dest[1] - ball[1]))
         notes = [
             f"receiver separation {sep:.1f}",

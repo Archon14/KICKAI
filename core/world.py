@@ -134,6 +134,62 @@ class WorldState:
 def simulated_attacking_third(seed: int = 7) -> WorldState:
     """Labeled SIMULATED clip for the tactical lab when no tracking exists."""
     rng = np.random.default_rng(seed)
+
+    # Select a reproducible tactical situation for this seed.
+    scenario_types = (
+        "counterattack",
+        "wing_attack",
+        "central_attack",
+        "high_pressure",
+    )
+    scenario_type = scenario_types[seed % len(scenario_types)]
+
+    # Realistic 4-3-3 attacking and defensive shapes (105m x 68m).
+    home_shape = [
+        (8, 34),   # Goalkeeper
+        (39, 12), (36, 27), (36, 42), (39, 56),  # Defenders
+        (55, 34), (64, 17), (64, 50),             # Midfielders
+        (80, 34), (75, 24), (75, 52),             # Forwards
+    ]
+    away_shape = [
+        (99, 34),  # Goalkeeper
+        (87, 12), (87, 27), (87, 42), (87, 56),  # Defenders
+        (76, 34), (72, 17), (72, 50),             # Midfielders
+        (58, 34), (60, 20), (60, 49),             # Forwards
+    ]
+    # Adjust team shape according to the tactical situation.
+    if scenario_type == "counterattack":
+        home_shape[5] = (57, 34)
+        home_shape[8] = (87, 34)
+        home_shape[9] = (82, 18)
+        home_shape[10] = (82, 51)
+        away_shape[5] = (72, 34)
+        away_shape[8] = (65, 34)
+
+    elif scenario_type == "wing_attack":
+        wing_y = 12 if seed % 2 == 0 else 56
+        home_shape[6] = (75, wing_y)
+        home_shape[9] = (83, wing_y)
+        home_shape[8] = (86, 34)
+        away_shape[5] = (78, wing_y)
+        away_shape[6] = (76, 34)
+
+    elif scenario_type == "central_attack":
+        home_shape[5] = (62, 34)
+        home_shape[6] = (72, 27)
+        home_shape[7] = (72, 42)
+        home_shape[8] = (86, 34)
+        away_shape[5] = (77, 31)
+        away_shape[6] = (77, 39)
+
+    elif scenario_type == "high_pressure":
+        away_shape[5] = (66, 30)
+        away_shape[6] = (65, 40)
+        away_shape[7] = (55, 34)
+        away_shape[8] = (51, 27)
+        home_shape[5] = (57, 34)
+        home_shape[6] = (65, 18)
+
     home = []
     away = []
     for i in range(11):
@@ -148,7 +204,10 @@ def simulated_attacking_third(seed: int = 7) -> WorldState:
                     role_fluid=["false nine", "inverted fullback", "roaming midfielder", "hybrid winger", "half-space"][i % 5],
                     cold_start=False,
                 ),
-                xy=np.array([70.0 + rng.normal(0, 6), 8 + i * 5.2], dtype=np.float64),
+                xy=np.array([
+                    np.clip(home_shape[i][0] + rng.normal(0, 3), 3, 101),
+                    np.clip(home_shape[i][1] + rng.normal(0, 3), 3, 65)
+                ], dtype=np.float64),
                 z=0.0,
                 velocity=np.array([rng.normal(1.5, 0.8), rng.normal(0, 1.0)], dtype=np.float64),
                 visibility=Visibility.VISIBLE,
@@ -168,7 +227,10 @@ def simulated_attacking_third(seed: int = 7) -> WorldState:
                     name=f"Away {i+1}",
                     role_fluid="pressing trigger" if i == 9 else "defender",
                 ),
-                xy=np.array([88.0 + rng.normal(0, 4), 10 + i * 4.8], dtype=np.float64),
+                xy=np.array([
+                    np.clip(away_shape[i][0] + rng.normal(0, 3), 3, 101),
+                    np.clip(away_shape[i][1] + rng.normal(0, 3), 3, 65)
+                ], dtype=np.float64),
                 z=0.0,
                 velocity=np.array([rng.normal(-0.6, 0.5), rng.normal(0, 0.8)], dtype=np.float64),
                 visibility=Visibility.VISIBLE,
@@ -185,8 +247,23 @@ def simulated_attacking_third(seed: int = 7) -> WorldState:
     away[-1].origin = Origin.UNAVAILABLE
     away[-1].confidence = 0.0
 
+    # Choose a midfielder or forward as the ball carrier.
+    # Select a suitable ball carrier for the tactical situation.
+    carrier_candidates = {
+        "counterattack": [5, 6, 7, 8, 9, 10],
+        "wing_attack": [6, 9] if seed % 2 == 0 else [7, 10],
+        "central_attack": [5, 7, 8],
+        "high_pressure": [5, 6, 7],
+    }
+    carrier_index = int(rng.choice(carrier_candidates[scenario_type]))
+    carrier = home[carrier_index]
+
+    # Keep the carrier close to their formation position.
+    carrier_x = float(np.clip(carrier.xy[0] + rng.uniform(-4, 6), 52, 92))
+    carrier_y = float(np.clip(carrier.xy[1] + rng.uniform(-4, 4), 5, 63))
+
     ball = BallState(
-        xy=np.array([78.0, 34.0], dtype=np.float64),
+        xy=np.array([carrier_x + 1.5, carrier_y + 0.5], dtype=np.float64),
         z=0.15,
         velocity=np.array([2.0, 0.4], dtype=np.float64),
         spin=None,
@@ -194,10 +271,32 @@ def simulated_attacking_third(seed: int = 7) -> WorldState:
         confidence=0.5,
         visibility=Visibility.VISIBLE,
     )
-    home[9].xy = np.array([76.5, 33.5], dtype=np.float64)
-    home[9].current_action = "on ball"
-    home[9].profile.finishing = 0.72
-    home[9].profile.passing = 0.68
+    # Randomize the ball carrier for each simulated scenario.
+    carrier.xy = np.array([carrier_x, carrier_y], dtype=np.float64)
+    carrier.current_action = "on ball"
+
+    # Defensive pressure varies with the match situation.
+    if scenario_type == "high_pressure":
+        # Two opponents press from different directions.
+        for defender, dx, dy in zip(
+            (away[5], away[6]),
+            (2.5, 4.0),
+            (-1.5, 2.0),
+        ):
+            defender.xy = np.array([
+                float(np.clip(carrier_x + dx, 3, 102)),
+                float(np.clip(carrier_y + dy, 3, 65)),
+            ], dtype=np.float64)
+            defender.current_action = "pressing ball carrier"
+
+    elif scenario_type == "counterattack":
+        # Defenders retreat toward their own goal.
+        for defender in away[1:5]:
+            if defender.xy is not None:
+                defender.xy[0] = float(
+                    np.clip(defender.xy[0] + 3.0, 3, 102)
+                )
+                defender.current_action = "retreating"
 
     quality = QualityReport(
         tracking_confidence=0.5,
@@ -209,7 +308,7 @@ def simulated_attacking_third(seed: int = 7) -> WorldState:
         completeness=0.85,
         issues=["SIMULATED world — not observed tracking", "one defender off-camera"],
     )
-    return WorldState(
+    state = WorldState(
         timestamp_s=70.0 * 60.0,
         players=home + away,
         ball=ball,
@@ -239,3 +338,5 @@ def simulated_attacking_third(seed: int = 7) -> WorldState:
             notes="Use only when live tracking is unavailable.",
         ),
     )
+    state.scenario_type = scenario_type
+    return state

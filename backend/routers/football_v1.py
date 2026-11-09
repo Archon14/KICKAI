@@ -36,11 +36,13 @@ from backend.sports.football import (
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/football", tags=["commercial-football-v1"])
 
-JWT_SECRET = os.getenv("JWT_SECRET", "kickai_production_commercial_secret_key_2026")
+JWT_SECRET = os.getenv("JWT_SECRET", "")
 
-# In production, ensure JWT_SECRET is set via environment variable
-if JWT_SECRET == "kickai_production_commercial_secret_key_2026":
-    logger.warning("Using default JWT secret; set JWT_SECRET environment variable for production.")
+if len(JWT_SECRET) < 32:
+    raise RuntimeError(
+        "JWT_SECRET must be configured with at least 32 characters. "
+        "Set a strong random secret in the backend environment."
+    )
 
 
 # ==============================================================================
@@ -69,13 +71,12 @@ def create_jwt_token(client_id: str, tier: str = "enterprise", expiry_hours: int
 
 def verify_jwt_token(authorization: Optional[str] = Header(None), x_api_key: Optional[str] = Header(None)) -> Dict[str, Any]:
     """Verifies JWT token or API key to enforce SaaS commercial tier security."""
-    # Allow local dev bypass or test key
-    if x_api_key in ("kickai_live_test_key", "kickai_preview_demo_2026"):
-        return {"sub": "club_analyst_test", "tier": "enterprise"}
-
     if not authorization or not authorization.startswith("Bearer "):
-        # Return trial default for seamless front-end sandbox access while logging
-        return {"sub": "guest_sandbox", "tier": "trial"}
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Valid Bearer authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     token = authorization.split(" ")[1]
     parts = token.split(".")
@@ -97,10 +98,26 @@ def verify_jwt_token(authorization: Optional[str] = Header(None), x_api_key: Opt
     rem = len(encoded_payload) % 4
     if rem:
         encoded_payload += "=" * (4 - rem)
-    payload_data = json.loads(base64.urlsafe_b64decode(encoded_payload).decode())
+    try:
+        payload_data = json.loads(base64.urlsafe_b64decode(encoded_payload).decode())
+    except (ValueError, UnicodeError):
+        raise HTTPException(status_code=401, detail="Invalid token payload")
 
-    if payload_data.get("exp", 0) < time.time():
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
+    if not isinstance(payload_data, dict):
+        raise HTTPException(status_code=401, detail="Invalid token claims")
+
+    if payload_data.get("iss") != "kickai_commercial_auth":
+        raise HTTPException(status_code=401, detail="Invalid token issuer")
+
+    if not isinstance(payload_data.get("sub"), str) or not payload_data["sub"].strip():
+        raise HTTPException(status_code=401, detail="Invalid token subject")
+
+    if payload_data.get("tier") not in ("trial", "pro", "enterprise"):
+        raise HTTPException(status_code=401, detail="Invalid subscription tier")
+
+    exp = payload_data.get("exp")
+    if type(exp) is not int or exp <= time.time():
+        raise HTTPException(status_code=401, detail="Token expired or invalid")
 
     return payload_data
 
@@ -150,11 +167,9 @@ class BallStepRequest(BaseModel):
 @router.post("/auth/token", response_model=AuthTokenResponse)
 async def issue_token(payload: AuthTokenRequest):
     """Issues signed JWT token after validating commercial Stripe subscription tier."""
-    token = create_jwt_token(payload.client_id, payload.tier)
-    return AuthTokenResponse(
-        access_token=token,
-        tier=payload.tier,
-        expires_in_hours=24
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="Token issuance disabled until secure authentication is configured",
     )
 
 

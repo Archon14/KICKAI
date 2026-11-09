@@ -44,6 +44,10 @@ export interface TacticsAnalyzeResponse {
   ball_origin: string;
   players_visible: number;
   players_off_camera: number;
+  pitch_players?: PitchPlayer[];
+  ball_position?: { x: number; y: number } | null;
+  ball_carrier_id?: string | null;
+  scenario_type?: string;
   mock?: boolean;
 }
 
@@ -125,6 +129,8 @@ export interface PlayerEvaluationRequest {
   max_speed_mps: number;
   accel_limit: number;
   fatigue: number;
+  defending: number;
+  physical: number;
 }
 
 export interface PlayerEvaluationResponse {
@@ -154,6 +160,7 @@ export interface DrillModel {
 }
 
 export interface TrainingAdaptiveDrillRequest {
+  success_streak?: number;
   success: boolean;
   error?: string | null;
   current_difficulty?: number;

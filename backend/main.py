@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.config import CORS_ORIGINS, USE_MOCK_DATA, OPENROUTER_API_KEY
 from backend.routers import (
     ai_coach,
+    auto_predict,
     coach,
     face_acoustic,
     football_v1,
@@ -50,6 +51,10 @@ class RateLimitMiddleware:
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        # CORS preflight requests should not consume the API rate limit.
+        if scope.get("method") == "OPTIONS" or scope.get("path") == "/api/health":
             await self.app(scope, receive, send)
             return
         # Get client IP (may be behind proxy; for simplicity use client host)
@@ -125,6 +130,25 @@ app.include_router(ai_coach.router)
 app.include_router(football_v1.router)
 app.include_router(video_analysis.router)
 app.include_router(face_acoustic.router)
+app.include_router(auto_predict.router)
+
+
+@app.get("/api/players/top")
+async def top_500_players() -> dict:
+    try:
+        from analytics.scraper import FALLBACK_TOP_500, FALLBACK_FORMATIONS
+        return {"source": "cached", "count": len(FALLBACK_TOP_500), "players": FALLBACK_TOP_500[:50], "formations_available": len(FALLBACK_FORMATIONS)}
+    except Exception:
+        return {"source": "offline", "count": 0, "players": [], "note": "Data fetched from cache or fresh scrape"}
+
+
+@app.get("/api/formations/popular")
+async def popular_formations() -> dict:
+    try:
+        from analytics.scraper import FALLBACK_FORMATIONS
+        return {"source": "cached", "formations": FALLBACK_FORMATIONS}
+    except Exception:
+        return {"source": "offline", "formations": [{"shape":"4-3-3","name":"4-3-3","category":"attacking","description":"Wingers high and wide"}], "note": "Standard formation set"}
 
 
 @app.get("/api/export/{report_type}")

@@ -93,26 +93,26 @@ export default function PitchCanvas({
   const scaleY = (m: number) => (m / 68) * PITCH_H;
 
   return (
-    <div className="relative w-full rounded-lg overflow-hidden bg-[#101413] border border-zinc-800 flex flex-col">
+    <div className="relative w-full rounded-lg overflow-hidden bg-[var(--kick-bg)] border border-[var(--kick-border)] flex flex-col">
       {/* Header bar */}
-      <div className="flex items-center justify-between px-3.5 py-2 bg-zinc-900/60 border-b border-zinc-800 text-xs">
+      <div className="flex items-center justify-between px-3.5 py-2 bg-[var(--kick-card)] border-b border-[var(--kick-border)] text-xs">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-zinc-200">
+          <span className="font-medium text-[var(--kick-text)]">
             {title || "Tactical Positioning & Vectors"}
           </span>
-          <span className="text-zinc-400 font-mono text-[11px] hidden sm:inline">
+          <span className="text-[var(--kick-muted)] font-mono text-[11px] hidden sm:inline">
             105m × 68m
           </span>
         </div>
 
-        <div className="flex items-center gap-3 text-[11px] text-zinc-400">
+        <div className="flex items-center gap-3 text-[11px] text-[var(--kick-muted)]">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-zinc-300">Home</span>
+            <span className="text-[var(--kick-text)]">Home</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-sky-400" />
-            <span className="text-zinc-300">Away</span>
+            <span className="text-[var(--kick-text)]">Away</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-white" />
@@ -320,32 +320,32 @@ export default function PitchCanvas({
         {/* Minimal Tooltip */}
         {hoveredPlayer && (
           <div
-            className="fixed pointer-events-none z-50 bg-zinc-900 border border-zinc-700/80 rounded-md p-2.5 shadow-lg text-xs text-zinc-200 min-w-[170px] -translate-x-1/2 -translate-y-full -mt-2"
+            className="fixed pointer-events-none z-50 bg-[var(--kick-card)] border border-[var(--kick-border)] rounded-md p-2.5 shadow-lg text-xs text-[var(--kick-text)] min-w-[170px] -translate-x-1/2 -translate-y-full -mt-2"
             style={{ left: `${tooltipPos.x}px`, top: `${tooltipPos.y}px` }}
           >
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-1 mb-1.5">
-              <span className="font-semibold text-zinc-100">
+            <div className="flex items-center justify-between border-b border-[var(--kick-border)] pb-1 mb-1.5">
+              <span className="font-semibold text-[var(--kick-text)]">
                 #{hoveredPlayer.number} {hoveredPlayer.name}
               </span>
-              <span className="text-[10px] uppercase font-mono text-zinc-400">
+              <span className="text-[10px] uppercase font-mono text-[var(--kick-muted)]">
                 {hoveredPlayer.team}
               </span>
             </div>
 
-            <div className="space-y-1 text-[11px] text-zinc-300">
+            <div className="space-y-1 text-[11px] text-[var(--kick-text)]">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Role:</span>
-                <span className="text-zinc-200">{hoveredPlayer.current_action || "Holding"}</span>
+                <span className="text-[var(--kick-muted)]">Role:</span>
+                <span className="text-[var(--kick-text)]">{hoveredPlayer.current_action || "Holding"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Energy:</span>
+                <span className="text-[var(--kick-muted)]">Energy:</span>
                 <span className="font-mono text-emerald-400">
                   {(hoveredPlayer.energy * 100).toFixed(0)}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Fatigue:</span>
-                <span className="font-mono text-zinc-300">
+                <span className="text-[var(--kick-muted)]">Fatigue:</span>
+                <span className="font-mono text-[var(--kick-text)]">
                   {(hoveredPlayer.fatigue * 100).toFixed(0)}%
                 </span>
               </div>

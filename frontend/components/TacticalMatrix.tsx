@@ -16,7 +16,7 @@ export default function TacticalMatrix({
 }: TacticalMatrixProps) {
   if (!options || options.length === 0) {
     return (
-      <div className="rounded-lg bg-zinc-900/40 border border-zinc-800 p-5 text-center text-xs text-zinc-400">
+      <div className="rounded-lg bg-[var(--kick-card)] border border-[var(--kick-border)] p-5 text-center text-xs text-[var(--kick-muted)]">
         No tactical alternatives generated yet.
       </div>
     );
@@ -26,17 +26,17 @@ export default function TacticalMatrix({
   const maxEV = Math.max(...sorted.map((o) => o.expected_value), 0.5);
 
   return (
-    <div className="rounded-lg bg-zinc-900/40 border border-zinc-800/80 p-4">
-      <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-800/80">
+    <div className="rounded-lg bg-[var(--kick-card)] border border-[var(--kick-border)] p-4">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-[var(--kick-border)]">
         <div>
-          <h3 className="text-sm font-semibold text-zinc-100">
+          <h3 className="text-sm font-semibold text-[var(--kick-text)]">
             Tactical Decision Matrix
           </h3>
-          <p className="text-[11px] text-zinc-400">
+          <p className="text-[11px] text-[var(--kick-muted)]">
             Attacking alternatives ranked by Expected Value (EV)
           </p>
         </div>
-        <span className="text-[11px] font-mono text-zinc-400">
+        <span className="text-[11px] font-mono text-[var(--kick-muted)]">
           {sorted.length} options
         </span>
       </div>
@@ -53,40 +53,40 @@ export default function TacticalMatrix({
               onClick={() => onSelectOption?.(opt)}
               className={`p-3 rounded-md border transition-colors cursor-pointer ${
                 isSelected
-                  ? "bg-zinc-800/70 border-zinc-600 text-zinc-100"
-                  : "bg-zinc-900/20 border-zinc-800/60 hover:bg-zinc-800/40 text-zinc-300"
+                  ? "bg-[var(--kick-card)] border-[var(--kick-primary)] text-[var(--kick-text)]"
+                  : "bg-[var(--kick-bg)] border-[var(--kick-border)] hover:brightness-110 text-[var(--kick-text)]"
               }`}
             >
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-zinc-400">
+                  <span className="text-[11px] font-mono text-[var(--kick-muted)]">
                     0{rank + 1}
                   </span>
-                  <span className="font-medium text-xs text-zinc-100">
+                  <span className="font-medium text-xs text-[var(--kick-text)]">
                     {opt.action}
                   </span>
                   {opt.target_player && (
-                    <span className="text-[10px] text-zinc-400 font-mono">
+                    <span className="text-[10px] text-[var(--kick-muted)] font-mono">
                       → {opt.target_player}
                     </span>
                   )}
                   {rank === 0 && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-500/20">
+                    <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-[var(--kick-bg)] text-[var(--kick-primary)] border border-[var(--kick-border)]">
                       Best
                     </span>
                   )}
                 </div>
 
                 <div className="text-right">
-                  <span className="text-xs font-mono font-semibold text-emerald-400">
+                  <span className="text-xs font-mono font-semibold text-[var(--kick-primary)]">
                     +{evPercent}%
                   </span>
-                  <span className="text-[10px] text-zinc-400 ml-1">EV</span>
+                  <span className="text-[10px] text-[var(--kick-muted)] ml-1">EV</span>
                 </div>
               </div>
 
               {/* Minimal bar */}
-              <div className="w-full bg-zinc-800/80 rounded-full h-1.5 overflow-hidden mb-2">
+              <div className="w-full bg-[var(--kick-bg)] rounded-full h-1.5 overflow-hidden mb-2">
                 <div
                   className="h-full bg-emerald-500/80 rounded-full transition-all duration-300"
                   style={{ width: `${barWidthPercent}%` }}
@@ -94,13 +94,13 @@ export default function TacticalMatrix({
               </div>
 
               {/* Stats Footer */}
-              <div className="flex items-center justify-between text-[11px] text-zinc-400">
+              <div className="flex items-center justify-between text-[11px] text-[var(--kick-muted)]">
                 <div className="flex items-center gap-3 font-mono">
                   <span>Risk {(opt.risk * 100).toFixed(0)}%</span>
                   <span>Conf {(opt.confidence * 100).toFixed(0)}%</span>
                 </div>
                 {opt.why && Object.keys(opt.why).length > 0 && (
-                  <span className="text-[10px] text-zinc-400 truncate max-w-[200px]">
+                  <span className="text-[10px] text-[var(--kick-muted)] truncate max-w-[200px]">
                     {Object.values(opt.why)[0]}
                   </span>
                 )}

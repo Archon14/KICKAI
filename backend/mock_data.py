@@ -306,9 +306,15 @@ def get_mock_training_response(
     success: bool,
     error: Optional[str] = None,
     current_difficulty: float = 0.4,
+    success_streak: int = 0,
 ) -> dict[str, Any]:
     if success:
-        next_diff = round(min(1.0, current_difficulty + 0.08), 3)
+        next_diff = round(
+            min(1.0, current_difficulty + 0.08)
+            if (success_streak + 1) % 3 == 0
+            else current_difficulty,
+            3,
+        )
         return {
             "weakness": "raise tempo / shrink space",
             "drill": {

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import LoadingPitch from "@/components/LoadingPitch";
 import { getCoachHistory } from "@/lib/api";
 import type { CoachLogEntry } from "@/lib/types";
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search, Download } from "lucide-react";
 
 export default function SessionLogsPage() {
   const [logs, setLogs] = useState<CoachLogEntry[]>([]);
@@ -32,7 +32,7 @@ export default function SessionLogsPage() {
     switch (action.toLowerCase()) {
       case "accept":
         return (
-          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-950/40 text-emerald-400 border border-emerald-500/20">
+          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-[var(--kick-bg)] text-[var(--kick-primary)] border border-[var(--kick-border)]">
             Accept
           </span>
         );
@@ -50,7 +50,7 @@ export default function SessionLogsPage() {
         );
       default:
         return (
-          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-zinc-800 text-zinc-300 border border-zinc-700/60">
+          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-[var(--kick-bg)] text-[var(--kick-text)] border border-[var(--kick-border)]">
             {action}
           </span>
         );
@@ -68,15 +68,54 @@ export default function SessionLogsPage() {
     return matchesAction && matchesQuery;
   });
 
+  function downloadLogs(format: "csv" | "json") {
+    if (filteredLogs.length === 0) return;
+
+    let content: string;
+    let mime: string;
+
+    if (format === "json") {
+      content = JSON.stringify(filteredLogs, null, 2);
+      mime = "application/json";
+    } else {
+      const headers = ["Timestamp", "Action", "Target", "Rationale", "Origin"];
+      const escapeCsv = (value: unknown) =>
+        `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+      const rows = filteredLogs.map((log) => [
+        log.timestamp,
+        log.action,
+        log.option_id ?? "",
+        log.note,
+        log.provenance?.origin || log.provenance?.decision_rule || "coach_api",
+      ]);
+
+      content = [headers, ...rows]
+        .map((row) => row.map(escapeCsv).join(","))
+        .join("\\r\\n");
+      mime = "text/csv;charset=utf-8";
+    }
+
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `kickai-session-logs-${new Date().toISOString().slice(0, 10)}.${format}`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-zinc-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-[var(--kick-border)]">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-100">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--kick-text)]">
             Coach Override Audit Trail
           </h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <p className="text-xs text-[var(--kick-muted)] mt-0.5">
             Tamper-evident logs recording tactical overrides and model challenges
           </p>
         </div>
@@ -85,12 +124,26 @@ export default function SessionLogsPage() {
           <button
             onClick={fetchLogs}
             disabled={loading}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-zinc-850 hover:bg-zinc-800 text-zinc-300 text-xs border border-zinc-750 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-[var(--kick-card)] hover:brightness-110 text-[var(--kick-text)] text-xs border border-[var(--kick-border)] transition-colors cursor-pointer"
           >
             <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
             Refresh
           </button>
-          <span className="text-xs font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded">
+          <button
+            onClick={() => downloadLogs("csv")}
+            disabled={loading || filteredLogs.length === 0}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-[var(--kick-primary)] text-[var(--kick-bg)] text-xs font-semibold disabled:opacity-40 cursor-pointer"
+          >
+            <Download size={13} /> CSV
+          </button>
+          <button
+            onClick={() => downloadLogs("json")}
+            disabled={loading || filteredLogs.length === 0}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-[var(--kick-card)] text-[var(--kick-text)] border border-[var(--kick-border)] text-xs disabled:opacity-40 cursor-pointer"
+          >
+            <Download size={13} /> JSON
+          </button>
+          <span className="text-xs font-mono text-[var(--kick-muted)] bg-[var(--kick-card)] border border-[var(--kick-border)] px-2 py-1 rounded">
             {logs.length} Entries
           </span>
         </div>
@@ -99,13 +152,13 @@ export default function SessionLogsPage() {
       {/* Filter and Search */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-72">
-          <Search size={14} className="absolute left-2.5 top-2.5 text-zinc-500" />
+          <Search size={14} className="absolute left-2.5 top-2.5 text-[var(--kick-muted)]" />
           <input
             type="text"
             placeholder="Search notes, options..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-zinc-900/60 border border-zinc-800 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
+            className="w-full bg-[var(--kick-card)] border border-[var(--kick-border)] rounded pl-8 pr-3 py-1.5 text-xs text-[var(--kick-text)] placeholder:text-[var(--kick-muted)] focus:outline-none focus:border-[var(--kick-primary)]"
           />
         </div>
 
@@ -116,8 +169,8 @@ export default function SessionLogsPage() {
               onClick={() => setFilterAction(act)}
               className={`px-2.5 py-1 rounded text-xs capitalize transition-colors ${
                 filterAction === act
-                  ? "bg-zinc-200 text-zinc-950 font-semibold"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-[var(--kick-primary)] text-[#07140f] font-semibold"
+                  : "text-[var(--kick-muted)] hover:text-[var(--kick-text)]"
               }`}
             >
               {act}
@@ -130,15 +183,15 @@ export default function SessionLogsPage() {
       {loading ? (
         <LoadingPitch label="Loading audit logs..." />
       ) : filteredLogs.length === 0 ? (
-        <div className="rounded-lg bg-zinc-900/40 border border-zinc-800 p-8 text-center text-xs text-zinc-400">
+        <div className="rounded-lg bg-[var(--kick-card)] border border-[var(--kick-border)] p-8 text-center text-xs text-[var(--kick-muted)]">
           No session log entries matched your filter.
         </div>
       ) : (
-        <div className="rounded-lg bg-zinc-900/40 border border-zinc-800/80 overflow-hidden">
+        <div className="rounded-lg bg-[var(--kick-card)] border border-[var(--kick-border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-400 uppercase tracking-wide font-medium text-[11px]">
+                <tr className="border-b border-[var(--kick-border)] text-[var(--kick-muted)] uppercase tracking-wide font-medium text-[11px]">
                   <th className="py-2.5 px-4 font-normal">Timestamp</th>
                   <th className="py-2.5 px-4 font-normal">Action</th>
                   <th className="py-2.5 px-4 font-normal">Target</th>
@@ -146,7 +199,7 @@ export default function SessionLogsPage() {
                   <th className="py-2.5 px-4 font-normal">Origin</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+              <tbody className="divide-y divide-[var(--kick-border)] text-[var(--kick-text)]">
                 {filteredLogs.map((log) => {
                   const dateStr = new Date(log.timestamp).toLocaleString("en-GB", {
                     dateStyle: "short",
@@ -158,9 +211,9 @@ export default function SessionLogsPage() {
                   return (
                     <tr
                       key={log.id}
-                      className="hover:bg-zinc-850/40 transition-colors"
+                      className="hover:bg-[var(--kick-card)] transition-colors"
                     >
-                      <td className="py-3 px-4 font-mono text-zinc-400 whitespace-nowrap text-[11px]">
+                      <td className="py-3 px-4 font-mono text-[var(--kick-muted)] whitespace-nowrap text-[11px]">
                         {dateStr}
                       </td>
 
@@ -168,15 +221,15 @@ export default function SessionLogsPage() {
                         {getActionBadge(log.action)}
                       </td>
 
-                      <td className="py-3 px-4 font-mono text-zinc-300 whitespace-nowrap">
+                      <td className="py-3 px-4 font-mono text-[var(--kick-text)] whitespace-nowrap">
                         {log.option_id ? log.option_id : "—"}
                       </td>
 
                       <td className="py-3 px-4 max-w-md">
-                        <span className="text-zinc-200 line-clamp-1">{log.note}</span>
+                        <span className="text-[var(--kick-text)] line-clamp-1">{log.note}</span>
                       </td>
 
-                      <td className="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-zinc-400">
+                      <td className="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-[var(--kick-muted)]">
                         {origin}
                       </td>
                     </tr>
